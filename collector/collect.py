@@ -33,6 +33,7 @@ TIMEOUT = (20, 60)
 BRAZIL_PAGE = "https://www.marinha.mil.br/chm/dados-do-segnav-aviso-radio-nautico-tela/avisos-radio-nauticos-e-sar"
 PANAMA_PAGE = "https://pancanal.com/en/advisories-to-shipping/"
 MPA_PAGE = "https://www.mpa.gov.sg/home?type=port+marine+notices"
+BRAZIL_HISTORY = f"https://www.marinha.mil.br/chm/dados-do-segnav-avradio-historico/historico-{datetime.now(timezone.utc).year}"
 
 SESSION = requests.Session()
 SESSION.headers.update(
@@ -112,45 +113,136 @@ def validate_brazil_json(raw: bytes) -> tuple[Any, int]:
     return payload, count
 
 
+def browser_html(url: str) -> tuple[str, str]:
+    """Fetch a public page with Chromium when ordinary server requests are blocked."""
+    from playwright.sync_api import sync_playwright
+
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch(headless=True)
+        page = browser.new_page(user_agent=USER_AGENT, locale="en-GB")
+        page.goto(url, wait_until="domcontentloaded", timeout=90000)
+        page.wait_for_timeout(5000)
+        content = page.content()
+        final_url = page.url
+        browser.close()
+    if len(content) < 300:
+        raise ValueError(f"Browser returned too little content from {url}")
+    return content, final_url
+
+
+def fetch_html_with_browser_fallback(url: str) -> tuple[str, str]:
+    try:
+        response = get(url, accept="text/html,application/xhtml+xml")
+        return response.text, response.url
+    except Exception:
+        return browser_html(url)
+
+
+def brazil_history_to_active_json(page_html: str) -> tuple[bytes, int]:
+    """Build parser-compatible JSON from CHM's official current-year history page.
+
+    CHM sometimes blocks data-centre requests to the live landing page. The official
+    history page still publishes the warning text. We locate the latest NAVAREA V
+    'messages in force' bulletin and retain only the warning references named in it.
+    """
+    text = BeautifulSoup(page_html, "lxml").get_text("\n", strip=True)
+    text = re.sub(r"[ \t]+", " ", text)
+    # CHM pages separate notices with repeated stars. Fall back to reference boundaries.
+    blocks = [normalise_space(x) for x in re.split(r"(?:\*\s*){3,}|(?=\n(?:NAVAREA\s+V\s+)?\d{4}/\d{2}\b)", text, flags=re.I) if normalise_space(x)]
+    bulletins = []
+    for idx, block in enumerate(blocks):
+        upper = block.upper()
+        if "NAVAREA V" in upper and re.search(r"AVISOS[- ]?RADIO.*EM VIGOR|MESSAGES? IN FORCE", upper):
+            refs = []
+            nav = re.search(r"NAVAREAS?\s*:\s*(.*?)(?:COSTEIROS?|LOCAIS?|SAR\s*:|$)", block, flags=re.I)
+            if nav:
+                refs = re.findall(r"\b\d{4}/\d{2}\b", nav.group(1))
+            if refs:
+                bulletin_ref = re.findall(r"\b\d{4}/\d{2}\b", block)
+                bulletins.append((idx, bulletin_ref[0] if bulletin_ref else "", list(dict.fromkeys(refs))))
+    if not bulletins:
+        raise ValueError("Official Brazil history page contained no NAVAREA V in-force bulletin")
+
+    _, bulletin_reference, active_refs = bulletins[-1]
+    records = []
+    for ref in active_refs:
+        candidates = [b for b in blocks if re.search(rf"(?:^|\s){re.escape(ref)}(?:\s|$)", b) and "EM VIGOR" not in b.upper()]
+        if not candidates:
+            continue
+        # Prefer the richest matching block; prepend source identity for the WP parser.
+        body = max(candidates, key=len)
+        records.append({"reference": ref, "source": "NAVAREA V", "text": f"NAVAREA V {ref} {body}"})
+    if not records:
+        raise ValueError("Brazil in-force bulletin was found but its active warning records were not reconstructed")
+    payload = {
+        "source": "Brazilian Navy Hydrographic Centre",
+        "inventory": "NAVAREA V warnings in force",
+        "bulletin_reference": bulletin_reference,
+        "records": records,
+    }
+    raw = (json.dumps(payload, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+    validate_brazil_json(raw)
+    return raw, len(records)
+
+
 def collect_brazil() -> Result:
-    page_response = get(BRAZIL_PAGE, accept="text/html,application/xhtml+xml")
-    page_html = page_response.text
-    candidates = extract_brazil_json_candidates(page_html, page_response.url)
     errors: list[str] = []
+    page_html = ""
+    page_url = BRAZIL_PAGE
+    try:
+        page_html, page_url = fetch_html_with_browser_fallback(BRAZIL_PAGE)
+        candidates = extract_brazil_json_candidates(page_html, page_url)
+        for candidate in candidates:
+            try:
+                try:
+                    json_response = get(candidate, accept="application/json,text/plain,*/*")
+                    raw = json_response.content
+                except Exception:
+                    # Chromium can retrieve the official JSON even where a data-centre HTTP
+                    # client is rejected. Read the rendered body as text.
+                    rendered, _ = browser_html(candidate)
+                    body = BeautifulSoup(rendered, "lxml").get_text("", strip=True)
+                    raw = body.encode("utf-8")
+                _, count = validate_brazil_json(raw)
+                relay_html = page_html
+                if candidate not in relay_html:
+                    relay_html += (
+                        "\n<!-- ViewShipping validated official avradio link -->\n"
+                        f'<a class="vsi-relay-avradio" href="{html_lib.escape(candidate, quote=True)}">avradio.json</a>\n'
+                    )
+                page_bytes = relay_html.encode("utf-8")
+                atomic_write(RELAY / "brazil/page.html", page_bytes)
+                atomic_write(RELAY / "brazil/avradio.json", raw)
+                return Result("brazil_chm", True, now_iso(), BRAZIL_PAGE,
+                              f"Validated official avradio JSON: {candidate}",
+                              {"page": "brazil/page.html", "json": "brazil/avradio.json"},
+                              {"page": sha256_bytes(page_bytes), "json": sha256_bytes(raw)}, count)
+            except Exception as exc:
+                errors.append(f"{candidate}: {exc}")
+    except Exception as exc:
+        errors.append(f"live page: {exc}")
 
-    for candidate in candidates:
-        try:
-            json_response = get(candidate, accept="application/json,text/plain,*/*")
-            _, count = validate_brazil_json(json_response.content)
-
-            # Ensure the snapshot page always exposes the exact validated official JSON link.
-            relay_html = page_html
-            if candidate not in relay_html:
-                relay_html += (
-                    "\n<!-- ViewShipping validated official avradio link -->\n"
-                    f'<a class="vsi-relay-avradio" href="{html_lib.escape(candidate, quote=True)}">avradio.json</a>\n'
-                )
-
-            page_path = RELAY / "brazil/page.html"
-            json_path = RELAY / "brazil/avradio.json"
-            page_bytes = relay_html.encode("utf-8")
-            atomic_write(page_path, page_bytes)
-            atomic_write(json_path, json_response.content)
-            fetched_at = now_iso()
-            return Result(
-                key="brazil_chm",
-                ok=True,
-                fetched_at=fetched_at,
-                official_url=BRAZIL_PAGE,
-                message=f"Validated official avradio JSON: {candidate}",
-                files={"page": "brazil/page.html", "json": "brazil/avradio.json"},
-                sha256={"page": sha256_bytes(page_bytes), "json": sha256_bytes(json_response.content)},
-                item_count=count,
-            )
-        except Exception as exc:  # noqa: BLE001 - each candidate is isolated
-            errors.append(f"{candidate}: {exc}")
-
-    raise RuntimeError("No valid official avradio JSON discovered. " + " | ".join(errors[-5:]))
+    # Official current-year history fallback. This is not treated as the whole
+    # historical archive: only references named by its latest in-force bulletin
+    # are emitted into the snapshot.
+    try:
+        history_html, history_url = fetch_html_with_browser_fallback(BRAZIL_HISTORY)
+        raw, count = brazil_history_to_active_json(history_html)
+        relay_html = (
+            history_html
+            + "\n<!-- ViewShipping official-history active inventory -->\n"
+            + '<a class="vsi-relay-avradio" href="avradio.json">avradio.json</a>\n'
+        )
+        page_bytes = relay_html.encode("utf-8")
+        atomic_write(RELAY / "brazil/page.html", page_bytes)
+        atomic_write(RELAY / "brazil/avradio.json", raw)
+        return Result("brazil_chm", True, now_iso(), history_url,
+                      f"Reconstructed {count} active NAVAREA V warnings from the latest official in-force bulletin",
+                      {"page": "brazil/page.html", "json": "brazil/avradio.json"},
+                      {"page": sha256_bytes(page_bytes), "json": sha256_bytes(raw)}, count)
+    except Exception as exc:
+        errors.append(f"history fallback: {exc}")
+    raise RuntimeError("Brazil CHM live and official-history fallbacks failed. " + " | ".join(errors[-6:]))
 
 
 def validate_panama(html: str) -> int:
@@ -180,12 +272,24 @@ def collect_panama() -> Result:
     )
 
 
-DATE_RE = re.compile(r"\b(?:Published\s+)?(\d{1,2}\s+[A-Za-z]{3,9}\s+20\d{2})\b", re.I)
-PMN_RE = re.compile(r"PORT\s+MARINE\s+NOTICE\s+NO\.?\s*[-:]?\s*\d{1,3}\s+OF\s+20\d{2}", re.I)
+DATE_RE = re.compile(r"\b(?:Published\s+)?(\d{1,2}\s+[A-Za-z]{3,9})(?:\s+(20\d{2}))?\b", re.I)
+PMN_RE = re.compile(r"(?:PORT\s+MARINE\s+NOTICE\s+NO\.?|PMN)\s*[-:]?\s*(\d{1,3})\s+OF\s+(20\d{2})", re.I)
 
 
 def normalise_space(value: str) -> str:
     return re.sub(r"\s+", " ", value).strip()
+
+
+def parse_mpa_heading(value: str) -> tuple[str, str, str] | None:
+    value = normalise_space(value)
+    match = re.search(r"(?:PORT\s+MARINE\s+NOTICE\s+NO\.?|PMN)\s*[-:]?\s*(\d{1,3})\s+OF\s+(20\d{2})\s*[-–—:]?\s*(.*)", value, flags=re.I)
+    if not match:
+        return None
+    number, year, subject = match.group(1), match.group(2), match.group(3).strip()
+    title = f"PORT MARINE NOTICE NO. {int(number)} OF {year}"
+    if subject:
+        title += f" - {subject}"
+    return title, number, year
 
 
 def extract_mpa_notices(page_html: str, base_url: str) -> list[dict[str, str]]:
@@ -194,45 +298,56 @@ def extract_mpa_notices(page_html: str, base_url: str) -> list[dict[str, str]]:
     seen: set[str] = set()
 
     for anchor in soup.find_all("a", href=True):
-        title = normalise_space(anchor.get_text(" ", strip=True))
         href = urljoin(base_url, anchor["href"])
-        combined = f"{title} {href}"
-        if not PMN_RE.search(combined) and "port-marine-notice" not in href.lower():
+        labels = [
+            anchor.get_text(" ", strip=True),
+            anchor.get("aria-label") or "",
+            anchor.get("title") or "",
+        ]
+        parsed = None
+        for label in labels:
+            parsed = parse_mpa_heading(label)
+            if parsed:
+                break
+        if not parsed and "port-marine-notice" in href.lower():
+            slug_label = href.rsplit("/", 1)[-1].replace("-", " ")
+            parsed = parse_mpa_heading(slug_label)
+        if not parsed or href in seen:
             continue
-        if not PMN_RE.search(title):
-            # Some cards put the title in an aria-label/title attribute.
-            title = normalise_space(anchor.get("aria-label") or anchor.get("title") or title)
-        if not PMN_RE.search(title):
-            continue
-        if href in seen:
-            continue
-
+        title, _, year = parsed
         date = ""
         parent = anchor
-        for _ in range(5):
+        for _ in range(6):
             parent = parent.parent if parent else None
             if parent is None:
                 break
-            match = DATE_RE.search(normalise_space(parent.get_text(" ", strip=True)))
-            if match:
-                date = match.group(1)
+            context = normalise_space(parent.get_text(" ", strip=True))
+            for match in DATE_RE.finditer(context):
+                day_month = match.group(1)
+                explicit_year = match.group(2) or year
+                # Avoid accidentally selecting a date embedded in the notice title.
+                if day_month and explicit_year:
+                    date = f"{day_month} {explicit_year}"
+                    break
+            if date:
                 break
-
         notices.append({"title": title, "url": href, "date": date})
         seen.add(href)
-
     return notices
 
 
-def fill_mpa_dates(notices: list[dict[str, str]], limit: int = 15) -> list[dict[str, str]]:
+def fill_mpa_dates(notices: list[dict[str, str]], limit: int = 20) -> list[dict[str, str]]:
     for notice in notices[:limit]:
         if notice["date"]:
             continue
         try:
-            detail = get(notice["url"], accept="text/html,application/xhtml+xml")
-            match = DATE_RE.search(normalise_space(BeautifulSoup(detail.text, "lxml").get_text(" ", strip=True)))
+            detail_html, _ = fetch_html_with_browser_fallback(notice["url"])
+            text = normalise_space(BeautifulSoup(detail_html, "lxml").get_text(" ", strip=True))
+            year_match = PMN_RE.search(notice["title"])
+            year = year_match.group(2) if year_match else str(datetime.now(timezone.utc).year)
+            match = DATE_RE.search(text)
             if match:
-                notice["date"] = match.group(1)
+                notice["date"] = f"{match.group(1)} {match.group(2) or year}"
         except Exception:
             continue
     return notices
@@ -271,24 +386,7 @@ def render_mpa_normalised_html(notices: Iterable[dict[str, str]]) -> str:
 
 
 def fetch_mpa_html() -> tuple[str, str]:
-    # Fast path: ordinary request. This frequently already contains the current cards.
-    response = get(MPA_PAGE, accept="text/html,application/xhtml+xml")
-    notices = extract_mpa_notices(response.text, response.url)
-    if notices:
-        return response.text, response.url
-
-    # JavaScript fallback for client-rendered responses.
-    from playwright.sync_api import sync_playwright
-
-    with sync_playwright() as playwright:
-        browser = playwright.chromium.launch(headless=True)
-        page = browser.new_page(user_agent=USER_AGENT, locale="en-GB")
-        page.goto(MPA_PAGE, wait_until="networkidle", timeout=90000)
-        page.wait_for_timeout(4000)
-        content = page.content()
-        final_url = page.url
-        browser.close()
-    return content, final_url
+    return fetch_html_with_browser_fallback(MPA_PAGE)
 
 
 def collect_mpa() -> Result:
