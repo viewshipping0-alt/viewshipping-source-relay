@@ -99,6 +99,51 @@ def extract_brazil_json_candidates(page_html: str, base_url: str) -> list[str]:
     return list(dict.fromkeys(candidates))
 
 
+
+def brazil_direct_json_candidates() -> list[str]:
+    now = datetime.now(timezone.utc)
+    months = []
+    for offset in range(5):
+        total = now.year * 12 + (now.month - 1) - offset
+        y, m0 = divmod(total, 12)
+        months.append((y, m0 + 1))
+    urls = []
+    for y, m in months:
+        ym = f"{y}-{m:02d}"
+        folders = [f"{ym}-%5BDEV%5D", f"{ym}-[DEV]", ym]
+        for folder in folders:
+            base = f"https://www.marinha.mil.br/chm/sites/www.marinha.mil.br.chm/files/{folder}/"
+            for n in range(180, 0, -1):
+                urls.append(f"{base}avradio_{n}.json")
+    return urls
+
+
+def probe_brazil_direct_json() -> tuple[str, bytes, int]:
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    candidates = brazil_direct_json_candidates()
+    def attempt(url: str):
+        try:
+            r = SESSION.get(url, timeout=(6, 15), allow_redirects=True, headers={"Accept": "application/json,text/plain,*/*"})
+            if r.status_code != 200 or len(r.content) < 100:
+                return None
+            _, count = validate_brazil_json(r.content)
+            return url, r.content, count
+        except Exception:
+            return None
+    for start in range(0, len(candidates), 120):
+        batch = candidates[start:start+120]
+        with ThreadPoolExecutor(max_workers=16) as pool:
+            futs = {pool.submit(attempt, u): i for i, u in enumerate(batch)}
+            found = []
+            for f in as_completed(futs):
+                result = f.result()
+                if result:
+                    found.append((futs[f], result))
+            if found:
+                found.sort(key=lambda x: x[0])
+                return found[0][1]
+    raise ValueError("No valid official CHM avradio JSON found in recent monthly directories")
+
 def validate_brazil_json(raw: bytes) -> tuple[Any, int]:
     payload = json.loads(raw.decode("utf-8-sig"))
     if not isinstance(payload, (list, dict)):
@@ -187,6 +232,15 @@ def brazil_history_to_active_json(page_html: str) -> tuple[bytes, int]:
 
 def collect_brazil() -> Result:
     errors: list[str] = []
+    try:
+        candidate, raw, count = probe_brazil_direct_json()
+        relay_html = f'<!doctype html><html><body><a class="vsi-relay-avradio" href="{html_lib.escape(candidate, quote=True)}">avradio.json</a></body></html>'
+        page_bytes = relay_html.encode("utf-8")
+        atomic_write(RELAY / "brazil/page.html", page_bytes)
+        atomic_write(RELAY / "brazil/avradio.json", raw)
+        return Result("brazil_chm", True, now_iso(), BRAZIL_PAGE, f"Validated official CHM JSON: {candidate}", {"page": "brazil/page.html", "json": "brazil/avradio.json"}, {"page": sha256_bytes(page_bytes), "json": sha256_bytes(raw)}, count)
+    except Exception as exc:
+        errors.append(f"direct JSON discovery: {exc}")
     page_html = ""
     page_url = BRAZIL_PAGE
     try:
@@ -292,6 +346,49 @@ def parse_mpa_heading(value: str) -> tuple[str, str, str] | None:
     return title, number, year
 
 
+
+def extract_mpa_detail_urls(page_html: str, base_url: str) -> list[str]:
+    decoded = html_lib.unescape(page_html).replace('\\/', '/')
+    urls = []
+    soup = BeautifulSoup(decoded, 'lxml')
+    for a in soup.find_all('a', href=True):
+        href = urljoin(base_url, a['href'])
+        if '/media-centre/details/' in href.lower():
+            urls.append(href)
+    pattern = r"(?:https?://www\.mpa\.gov\.sg)?(/media-centre/details/[A-Za-z0-9%_().~!$&*,;=:@+\-/]+)"
+    for match in re.findall(pattern, decoded, flags=re.I):
+        urls.append(urljoin(base_url, match.rstrip('\"<>),.;]')))
+    return list(dict.fromkeys(urls))[:200]
+
+
+def parse_mpa_detail_page(detail_html: str, url: str) -> dict[str, str] | None:
+    soup = BeautifulSoup(detail_html, 'lxml')
+    text = normalise_space(soup.get_text(' ', strip=True))
+    heading = ''
+    for tag in soup.find_all(['h1','h2','h3','title']):
+        candidate = normalise_space(tag.get_text(' ', strip=True))
+        if parse_mpa_heading(candidate):
+            heading = candidate
+            break
+    if not heading:
+        slug = url.rsplit('/',1)[-1].replace('-', ' ')
+        if parse_mpa_heading(slug):
+            heading = slug
+    parsed = parse_mpa_heading(heading)
+    if not parsed:
+        m = PMN_RE.search(text)
+        if not m:
+            return None
+        parsed = (f"PORT MARINE NOTICE NO. {int(m.group(1))} OF {m.group(2)}", m.group(1), m.group(2))
+    title, _, year = parsed
+    m = re.search(r'Published\s+(\d{1,2}\s+[A-Za-z]{3,9}\s+20\d{2})', text, flags=re.I)
+    if m:
+        date = normalise_space(m.group(1))
+    else:
+        d = DATE_RE.search(text)
+        date = f"{d.group(1)} {d.group(2) or year}" if d else ''
+    return {'title': title, 'url': url, 'date': date} if date else None
+
 def extract_mpa_notices(page_html: str, base_url: str) -> list[dict[str, str]]:
     soup = BeautifulSoup(page_html, "lxml")
     notices: list[dict[str, str]] = []
@@ -392,7 +489,20 @@ def fetch_mpa_html() -> tuple[str, str]:
 def collect_mpa() -> Result:
     source_html, final_url = fetch_mpa_html()
     notices = extract_mpa_notices(source_html, final_url)
-    notices = fill_mpa_dates(notices)
+    known = {item["url"] for item in notices}
+    detail_urls = extract_mpa_detail_urls(source_html, final_url)
+    for url in detail_urls:
+        if url in known:
+            continue
+        try:
+            detail_html, _ = fetch_html_with_browser_fallback(url)
+            item = parse_mpa_detail_page(detail_html, url)
+            if item:
+                notices.append(item)
+                known.add(url)
+        except Exception:
+            continue
+    notices = fill_mpa_dates(notices, limit=60)
     notices = [item for item in notices if item["date"] and PMN_RE.search(item["title"])]
     if not notices:
         raise ValueError("No dated official Port Marine Notices found")
@@ -492,10 +602,10 @@ def main() -> int:
     # Do not fail the workflow merely because one authority is temporarily unavailable;
     # retained snapshots remain usable. Fail only when all three have never succeeded.
     usable = sum(1 for state in source_states.values() if state.get("status") == "ok" and state.get("fetched_at"))
-    if usable == 0:
-        print("No usable source snapshot exists yet.", file=sys.stderr)
+    if usable < 3:
+        print(f"Collector incomplete: only {usable}/3 sources usable.", file=sys.stderr)
         return 1
-    print(f"Collector completed with {usable}/3 usable sources; {failures} attempt failure(s).")
+    print("Collector completed with 3/3 usable sources.")
     return 0
 
 
