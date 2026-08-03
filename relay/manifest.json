@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-08-03T08:03:20Z",
+  "generated_at": "2026-08-03T08:12:59Z",
   "purpose": "Validated official-source snapshots for the ViewShipping Intelligence Relay Bridge",
   "schema_version": 1,
   "sources": {
     "brazil_chm": {
       "fetched_at": null,
       "files": {},
-      "last_attempt_at": "2026-08-03T08:03:08Z",
-      "last_attempt_error": "403 Client Error: Forbidden for url: https://www.marinha.mil.br/chm/dados-do-segnav-aviso-radio-nautico-tela/avisos-radio-nauticos-e-sar",
+      "last_attempt_at": "2026-08-03T08:12:58Z",
+      "last_attempt_error": "Brazil CHM live and official-history fallbacks failed. history fallback: Official Brazil history page contained no NAVAREA V in-force bulletin",
       "last_attempt_status": "failed",
       "status": "unavailable"
     },
     "mpa_singapore": {
       "fetched_at": null,
       "files": {},
-      "last_attempt_at": "2026-08-03T08:03:20Z",
+      "last_attempt_at": "2026-08-03T08:12:59Z",
       "last_attempt_error": "No dated official Port Marine Notices found",
       "last_attempt_status": "failed",
       "status": "unavailable"
     },
     "panama_canal": {
-      "fetched_at": "2026-08-03T08:03:08Z",
+      "fetched_at": "2026-08-03T08:12:58Z",
       "files": {
         "page": "panama/advisories.html"
       },
@@ -28,7 +28,7 @@
       "message": "Validated 200 advisory references from the official table",
       "official_url": "https://pancanal.com/en/advisories-to-shipping/",
       "sha256": {
-        "page": "9e27c22e16cb3ae40a267c661540950d5ce5c5ff9504e8e40e083085390fcbc5"
+        "page": "24fa2e386cc9f92f87ea2c1512564a3bf75eabe5008b8376833ef94382dc1b23"
       },
       "status": "ok"
     }
