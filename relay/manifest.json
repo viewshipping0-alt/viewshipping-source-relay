@@ -1,26 +1,33 @@
 {
-  "generated_at": "2026-08-03T08:12:59Z",
+  "generated_at": "2026-08-03T08:47:20Z",
   "purpose": "Validated official-source snapshots for the ViewShipping Intelligence Relay Bridge",
   "schema_version": 1,
   "sources": {
     "brazil_chm": {
       "fetched_at": null,
       "files": {},
-      "last_attempt_at": "2026-08-03T08:12:58Z",
-      "last_attempt_error": "Brazil CHM live and official-history fallbacks failed. history fallback: Official Brazil history page contained no NAVAREA V in-force bulletin",
+      "last_attempt_at": "2026-08-03T08:47:15Z",
+      "last_attempt_error": "Brazil CHM live and official-history fallbacks failed. direct JSON discovery: No valid official CHM avradio JSON found in recent monthly directories | history fallback: Browser page lacked required warning markers at https://www.marinha.mil.br/chm/dados-do-segnav-avradio-historico/historico-2026",
       "last_attempt_status": "failed",
       "status": "unavailable"
     },
     "mpa_singapore": {
-      "fetched_at": null,
-      "files": {},
-      "last_attempt_at": "2026-08-03T08:12:59Z",
-      "last_attempt_error": "No dated official Port Marine Notices found",
-      "last_attempt_status": "failed",
-      "status": "unavailable"
+      "fetched_at": "2026-08-03T08:47:20Z",
+      "files": {
+        "html": "mpa/notices.html",
+        "markdown": "mpa/notices.md"
+      },
+      "item_count": 1,
+      "message": "Validated 1 dated official Port Marine Notices",
+      "official_url": "https://www.mpa.gov.sg/home?type=port+marine+notices",
+      "sha256": {
+        "html": "5ea945435998980d11398452b69ea7c1b10cc70fd195d33f03bdbfd562a838b4",
+        "markdown": "c0ff591ec2fb7064a79defb419f2d7dbeb9f68af88f26817e6ce733cbe63219f"
+      },
+      "status": "ok"
     },
     "panama_canal": {
-      "fetched_at": "2026-08-03T08:12:58Z",
+      "fetched_at": "2026-08-03T08:47:15Z",
       "files": {
         "page": "panama/advisories.html"
       },
@@ -28,7 +35,7 @@
       "message": "Validated 200 advisory references from the official table",
       "official_url": "https://pancanal.com/en/advisories-to-shipping/",
       "sha256": {
-        "page": "24fa2e386cc9f92f87ea2c1512564a3bf75eabe5008b8376833ef94382dc1b23"
+        "page": "514e7bc66259737f542f042be57b8469034dc12c9bcb1b48fe40b0939465fc93"
       },
       "status": "ok"
     }
