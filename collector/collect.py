@@ -26,7 +26,7 @@ ROOT = Path(__file__).resolve().parents[1]
 RELAY = ROOT / "relay"
 USER_AGENT = (
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
-    "Chrome/126 Safari/537.36 ViewShipping-Official-Source-Relay/1.0"
+    "Chrome/126 Safari/537.36 ViewShipping-Official-Source-Relay/1.3"
 )
 TIMEOUT = (20, 60)
 
@@ -158,77 +158,216 @@ def validate_brazil_json(raw: bytes) -> tuple[Any, int]:
     return payload, count
 
 
-def browser_html(url: str) -> tuple[str, str]:
-    """Fetch a public page with Chromium when ordinary server requests are blocked."""
+def browser_html(url: str, *, required_pattern: str | None = None, wait_ms: int = 7000) -> tuple[str, str]:
+    """Fetch a public page with Chromium when ordinary server requests are blocked
+    or return an incomplete client-rendered shell.
+
+    Some CHM pages return HTTP 200 to data-centre clients but omit the Drupal View
+    containing the warnings.  A status-code-only check is therefore insufficient.
+    """
     from playwright.sync_api import sync_playwright
 
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(headless=True)
-        page = browser.new_page(user_agent=USER_AGENT, locale="en-GB")
+        page = browser.new_page(user_agent=USER_AGENT, locale="pt-BR")
         page.goto(url, wait_until="domcontentloaded", timeout=90000)
-        page.wait_for_timeout(5000)
+        try:
+            page.wait_for_load_state("networkidle", timeout=30000)
+        except Exception:
+            pass
+        # Trigger lazy Drupal Views and wait for client-side content.
+        page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+        page.wait_for_timeout(wait_ms)
         content = page.content()
+        body_text = page.locator("body").inner_text(timeout=15000)
         final_url = page.url
         browser.close()
+
+    # Preserve the rendered text even when the DOM source only contains a shell.
+    if body_text and body_text not in content:
+        content += "\n<!-- ViewShipping rendered body text -->\n<pre>" + html_lib.escape(body_text) + "</pre>\n"
     if len(content) < 300:
         raise ValueError(f"Browser returned too little content from {url}")
+    if required_pattern and not re.search(required_pattern, body_text + "\n" + content, flags=re.I | re.S):
+        raise ValueError(f"Browser page lacked required warning markers at {url}")
     return content, final_url
 
 
-def fetch_html_with_browser_fallback(url: str) -> tuple[str, str]:
+def fetch_html_with_browser_fallback(
+    url: str,
+    *,
+    required_pattern: str | None = None,
+    wait_ms: int = 7000,
+) -> tuple[str, str]:
+    """Use requests only when the response also contains the required source data."""
     try:
         response = get(url, accept="text/html,application/xhtml+xml")
+        if required_pattern and not re.search(required_pattern, response.text, flags=re.I | re.S):
+            raise ValueError("HTTP response was a page shell without the required source data")
         return response.text, response.url
     except Exception:
-        return browser_html(url)
+        return browser_html(url, required_pattern=required_pattern, wait_ms=wait_ms)
+
+
+def _brazil_text(page_html: str) -> str:
+    soup = BeautifulSoup(page_html, "lxml")
+    text = soup.get_text("\n", strip=True)
+    text = html_lib.unescape(text).replace("\xa0", " ").replace("\r", "\n")
+    text = re.sub(r"[ \t]+", " ", text)
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    return text.strip()
+
+
+def _brazil_in_force_bulletins(text: str) -> list[tuple[int, str, list[str]]]:
+    """Return (position, bulletin reference, active NAVAREA references).
+
+    CHM has used both 'NAVAREA V' and 'CONHECIMENTO GERAL' for weekly in-force
+    inventories, and its Drupal output sometimes removes the visual separators.
+    This parser therefore scans the full rendered text rather than relying on HTML
+    block boundaries.
+    """
+    normalized = remove_diacritics(text).upper()
+    marker_re = re.compile(
+        r"AVISOS\s*[- ]?\s*RADIO\s+NAUTICOS\s+E\s+AVISOS\s+SAR\s+EM\s+VIGOR",
+        flags=re.I,
+    )
+    results: list[tuple[int, str, list[str]]] = []
+    for marker in marker_re.finditer(normalized):
+        # The bulletin reference appears shortly before the marker, usually twice.
+        before = normalized[max(0, marker.start() - 500):marker.start()]
+        refs_before = re.findall(r"\b\d{4}/\d{2}\b", before)
+        bulletin_ref = refs_before[-1] if refs_before else ""
+
+        # Search a bounded forward window.  NAVAREAS is followed by COSTEIROS,
+        # LOCAIS, a new warning separator, or the next bulletin/notice.
+        after = normalized[marker.end():marker.end() + 12000]
+        nav_match = re.search(
+            r"NAVAREAS?\s*:\s*(.*?)(?=\n\s*(?:COSTEIROS?|LOCAIS?|SAR\s*:|\*\s*\*\s*\*|[A-Z]\s+\d{4}/\d{2}|\d{4}/\d{2}\s*$)|$)",
+            after,
+            flags=re.I | re.S | re.M,
+        )
+        if not nav_match:
+            # Some Drupal renderings flatten line breaks.  Stop at the next
+            # category label or after a conservative character window.
+            nav_match = re.search(
+                r"NAVAREAS?\s*:\s*((?:\d{4}/\d{2}\s*;?\s*){1,200})",
+                after,
+                flags=re.I,
+            )
+        if not nav_match:
+            continue
+        active_refs = list(dict.fromkeys(re.findall(r"\b\d{4}/\d{2}\b", nav_match.group(1))))
+        if active_refs:
+            results.append((marker.start(), bulletin_ref, active_refs))
+    return results
+
+
+def _brazil_notice_segments(text: str) -> list[str]:
+    """Split CHM history text into warning-sized segments using several layouts."""
+    segments: list[str] = []
+    # Primary separator shown by CHM between notices.
+    for part in re.split(r"(?:\n\s*\*\s*\*\s*\*\s*\n|\n-{3,}\n)", text):
+        part = normalise_space(part)
+        if len(part) >= 20 and re.search(r"\b\d{4}/\d{2}\b", part):
+            segments.append(part)
+
+    # If the rendered page removed separators, create sections at duplicated
+    # warning-reference lines (the CHM view typically prints each reference twice).
+    if len(segments) < 5:
+        line_text = re.sub(r"[ \t]+", " ", text)
+        heading = re.compile(
+            r"(?m)^\s*(?:(?:NAVAREA\s+V|SAR|[INSE])\s+)?(\d{4}/\d{2})\s*\n\s*(?:(?:NAVAREA\s+V|SAR|[INSE])\s+)?\1\s*$"
+        )
+        matches = list(heading.finditer(remove_diacritics(line_text).upper()))
+        for index, match in enumerate(matches):
+            stop = matches[index + 1].start() if index + 1 < len(matches) else min(len(line_text), match.start() + 5000)
+            original = normalise_space(line_text[match.start():stop])
+            if len(original) >= 20:
+                segments.append(original)
+
+    # Deduplicate while retaining order.
+    return list(dict.fromkeys(segments))
+
+
+def remove_diacritics(value: str) -> str:
+    import unicodedata
+    return "".join(ch for ch in unicodedata.normalize("NFKD", value) if not unicodedata.combining(ch))
 
 
 def brazil_history_to_active_json(page_html: str) -> tuple[bytes, int]:
-    """Build parser-compatible JSON from CHM's official current-year history page.
-
-    CHM sometimes blocks data-centre requests to the live landing page. The official
-    history page still publishes the warning text. We locate the latest NAVAREA V
-    'messages in force' bulletin and retain only the warning references named in it.
-    """
-    text = BeautifulSoup(page_html, "lxml").get_text("\n", strip=True)
-    text = re.sub(r"[ \t]+", " ", text)
-    # CHM pages separate notices with repeated stars. Fall back to reference boundaries.
-    blocks = [normalise_space(x) for x in re.split(r"(?:\*\s*){3,}|(?=\n(?:NAVAREA\s+V\s+)?\d{4}/\d{2}\b)", text, flags=re.I) if normalise_space(x)]
-    bulletins = []
-    for idx, block in enumerate(blocks):
-        upper = block.upper()
-        if "NAVAREA V" in upper and re.search(r"AVISOS[- ]?RADIO.*EM VIGOR|MESSAGES? IN FORCE", upper):
-            refs = []
-            nav = re.search(r"NAVAREAS?\s*:\s*(.*?)(?:COSTEIROS?|LOCAIS?|SAR\s*:|$)", block, flags=re.I)
-            if nav:
-                refs = re.findall(r"\b\d{4}/\d{2}\b", nav.group(1))
-            if refs:
-                bulletin_ref = re.findall(r"\b\d{4}/\d{2}\b", block)
-                bulletins.append((idx, bulletin_ref[0] if bulletin_ref else "", list(dict.fromkeys(refs))))
+    """Build parser-compatible JSON from CHM's official current-year history page."""
+    text = _brazil_text(page_html)
+    bulletins = _brazil_in_force_bulletins(text)
     if not bulletins:
-        raise ValueError("Official Brazil history page contained no NAVAREA V in-force bulletin")
+        marker_count = len(re.findall(r"AVISOS", remove_diacritics(text), flags=re.I))
+        raise ValueError(
+            f"Official Brazil history page contained no parseable NAVAREA V in-force bulletin "
+            f"(rendered text {len(text)} chars; AVISOS markers {marker_count})"
+        )
 
+    # The last occurrence is the latest published inventory on the chronological page.
     _, bulletin_reference, active_refs = bulletins[-1]
-    records = []
+    segments = _brazil_notice_segments(text)
+    records: list[dict[str, str]] = []
+
     for ref in active_refs:
-        candidates = [b for b in blocks if re.search(rf"(?:^|\s){re.escape(ref)}(?:\s|$)", b) and "EM VIGOR" not in b.upper()]
+        candidates = []
+        for segment in segments:
+            if not re.search(rf"(?<!\d){re.escape(ref)}(?!\d)", segment):
+                continue
+            upper = remove_diacritics(segment).upper()
+            if re.search(r"AVISOS\s*[- ]?\s*RADIO.*EM\s+VIGOR|MESSAGES?\s+IN\s+FORCE", upper):
+                continue
+            candidates.append(segment)
+
+        if not candidates:
+            # Last-resort bounded extraction around each exact reference.
+            positions = [m.start() for m in re.finditer(rf"(?<!\d){re.escape(ref)}(?!\d)", text)]
+            for pos in positions:
+                start = max(0, text.rfind("\n", 0, pos - 300))
+                star = text.find("* * *", pos)
+                stop = star if star != -1 and star - pos < 5000 else min(len(text), pos + 3500)
+                candidate = normalise_space(text[start:stop])
+                upper = remove_diacritics(candidate).upper()
+                if len(candidate) >= 30 and "EM VIGOR" not in upper:
+                    candidates.append(candidate)
+
         if not candidates:
             continue
-        # Prefer the richest matching block; prepend source identity for the WP parser.
-        body = max(candidates, key=len)
-        records.append({"reference": ref, "source": "NAVAREA V", "text": f"NAVAREA V {ref} {body}"})
+        # Prefer detailed operational text over a cancellation-only duplicate.
+        candidates.sort(
+            key=lambda value: (
+                bool(re.search(r"\b(?:CARTA|EM\s+\d{1,2}-\d{2}|OPERAC|REBOQUE|FAROL|BOIA|PERIGO|NAUFRAG|INTERDIC|MANOBRAS|PLATAFORMA)\b", remove_diacritics(value), flags=re.I)),
+                len(value),
+            ),
+            reverse=True,
+        )
+        body = candidates[0]
+        records.append(
+            {
+                "reference": ref,
+                "source": "NAVAREA V",
+                "text": f"NAVAREA V {ref}\n{body}",
+            }
+        )
+
     if not records:
-        raise ValueError("Brazil in-force bulletin was found but its active warning records were not reconstructed")
+        raise ValueError(
+            f"Brazil in-force bulletin {bulletin_reference or '(unknown)'} named {len(active_refs)} warnings, "
+            "but no warning text could be reconstructed"
+        )
+
     payload = {
         "source": "Brazilian Navy Hydrographic Centre",
+        "official_url": BRAZIL_HISTORY,
         "inventory": "NAVAREA V warnings in force",
         "bulletin_reference": bulletin_reference,
+        "active_reference_count": len(active_refs),
         "records": records,
     }
     raw = (json.dumps(payload, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
     validate_brazil_json(raw)
     return raw, len(records)
-
 
 def collect_brazil() -> Result:
     errors: list[str] = []
@@ -280,7 +419,11 @@ def collect_brazil() -> Result:
     # historical archive: only references named by its latest in-force bulletin
     # are emitted into the snapshot.
     try:
-        history_html, history_url = fetch_html_with_browser_fallback(BRAZIL_HISTORY)
+        history_html, history_url = fetch_html_with_browser_fallback(
+            BRAZIL_HISTORY,
+            required_pattern=r"AVISOS\s*[- ]?\s*RADIO|NAVAREAS?\s*:",
+            wait_ms=12000,
+        )
         raw, count = brazil_history_to_active_json(history_html)
         relay_html = (
             history_html
