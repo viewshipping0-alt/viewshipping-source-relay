@@ -1,10 +1,36 @@
 {
+  "generated_at": "2026-08-03T08:03:20Z",
+  "purpose": "Validated official-source snapshots for the ViewShipping Intelligence Relay Bridge",
   "schema_version": 1,
-  "generated_at": null,
-  "purpose": "Run the GitHub Action once to populate validated official-source snapshots.",
   "sources": {
-    "brazil_chm": {"status": "unavailable", "fetched_at": null, "files": {}},
-    "panama_canal": {"status": "unavailable", "fetched_at": null, "files": {}},
-    "mpa_singapore": {"status": "unavailable", "fetched_at": null, "files": {}}
+    "brazil_chm": {
+      "fetched_at": null,
+      "files": {},
+      "last_attempt_at": "2026-08-03T08:03:08Z",
+      "last_attempt_error": "403 Client Error: Forbidden for url: https://www.marinha.mil.br/chm/dados-do-segnav-aviso-radio-nautico-tela/avisos-radio-nauticos-e-sar",
+      "last_attempt_status": "failed",
+      "status": "unavailable"
+    },
+    "mpa_singapore": {
+      "fetched_at": null,
+      "files": {},
+      "last_attempt_at": "2026-08-03T08:03:20Z",
+      "last_attempt_error": "No dated official Port Marine Notices found",
+      "last_attempt_status": "failed",
+      "status": "unavailable"
+    },
+    "panama_canal": {
+      "fetched_at": "2026-08-03T08:03:08Z",
+      "files": {
+        "page": "panama/advisories.html"
+      },
+      "item_count": 200,
+      "message": "Validated 200 advisory references from the official table",
+      "official_url": "https://pancanal.com/en/advisories-to-shipping/",
+      "sha256": {
+        "page": "9e27c22e16cb3ae40a267c661540950d5ce5c5ff9504e8e40e083085390fcbc5"
+      },
+      "status": "ok"
+    }
   }
 }
