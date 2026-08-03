@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "generated_at": null,
+  "purpose": "Run the GitHub Action once to populate validated official-source snapshots.",
+  "sources": {
+    "brazil_chm": {"status": "unavailable", "fetched_at": null, "files": {}},
+    "panama_canal": {"status": "unavailable", "fetched_at": null, "files": {}},
+    "mpa_singapore": {"status": "unavailable", "fetched_at": null, "files": {}}
+  }
+}
