@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-08-14T21:05:34Z",
+  "generated_at": "2026-08-14T21:59:41Z",
   "purpose": "Validated official-source snapshots for the ViewShipping Intelligence Relay Bridge",
   "schema_version": 1,
   "sources": {
     "brazil_chm": {
       "fetched_at": null,
       "files": {},
-      "last_attempt_at": "2026-08-14T21:05:21Z",
+      "last_attempt_at": "2026-08-14T21:59:35Z",
       "last_attempt_error": "Brazil CHM live and official-history fallbacks failed. direct JSON discovery: No valid official CHM avradio JSON found in recent monthly directories | history fallback: Browser page lacked required warning markers at https://www.marinha.mil.br/chm/dados-do-segnav-avradio-historico/historico-2026",
       "last_attempt_status": "failed",
       "status": "unavailable"
     },
     "mpa_singapore": {
-      "fetched_at": "2026-08-14T21:05:34Z",
+      "fetched_at": "2026-08-14T21:59:41Z",
       "files": {
         "html": "mpa/notices.html",
         "markdown": "mpa/notices.md"
@@ -27,7 +27,7 @@
       "status": "ok"
     },
     "panama_canal": {
-      "fetched_at": "2026-08-14T21:05:27Z",
+      "fetched_at": "2026-08-14T21:59:35Z",
       "files": {
         "page": "panama/advisories.html"
       },
@@ -35,7 +35,7 @@
       "message": "Validated 176 advisory references from the official table",
       "official_url": "https://pancanal.com/en/advisories-to-shipping/",
       "sha256": {
-        "page": "986bb4ec2da02a2a57f35d8d79f08d6b967d15c966dbdf2a2be96672da649b22"
+        "page": "fd833aee63a8575eb07bc1c5ab6b3c76c9111203c83bb8b71582f4b237055496"
       },
       "status": "ok"
     }
