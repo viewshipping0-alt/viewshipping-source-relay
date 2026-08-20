@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-08-20T17:03:19Z",
+  "generated_at": "2026-08-20T19:19:53Z",
   "purpose": "Validated official-source snapshots for the ViewShipping Intelligence Relay Bridge",
   "schema_version": 1,
   "sources": {
     "brazil_chm": {
       "fetched_at": null,
       "files": {},
-      "last_attempt_at": "2026-08-20T17:03:02Z",
+      "last_attempt_at": "2026-08-20T19:19:46Z",
       "last_attempt_error": "Brazil CHM live and official-history fallbacks failed. direct JSON discovery: No valid official CHM avradio JSON found in recent monthly directories | history fallback: Browser page lacked required warning markers at https://www.marinha.mil.br/chm/dados-do-segnav-avradio-historico/historico-2026",
       "last_attempt_status": "failed",
       "status": "unavailable"
     },
     "mpa_singapore": {
-      "fetched_at": "2026-08-20T17:03:19Z",
+      "fetched_at": "2026-08-20T19:19:53Z",
       "files": {
         "html": "mpa/notices.html",
         "markdown": "mpa/notices.md"
@@ -27,18 +27,15 @@
       "status": "ok"
     },
     "panama_canal": {
-      "fetched_at": "2026-08-20T14:22:33Z",
+      "fetched_at": "2026-08-20T19:19:46Z",
       "files": {
         "page": "panama/advisories.html"
       },
       "item_count": 177,
-      "last_attempt_at": "2026-08-20T17:03:12Z",
-      "last_attempt_error": "HTTPSConnectionPool(host='pancanal.com', port=443): Max retries exceeded with url: /en/advisories-to-shipping/ (Caused by NameResolutionError(\"HTTPSConnection(host='pancanal.com', port=443): Failed to resolve 'pancanal.com' ([Errno -3] Temporary failure in name resolution)\"))",
-      "last_attempt_status": "failed",
       "message": "Validated 177 advisory references from the official table",
       "official_url": "https://pancanal.com/en/advisories-to-shipping/",
       "sha256": {
-        "page": "6c632ed66422f8cebf0ba826509b813818515fdb534714df0ec8a262a0614e39"
+        "page": "3f342048df30bd5f76bd16e283fff377dee55f2b135ab1ab96ed9a4a0875d2b5"
       },
       "status": "ok"
     }
