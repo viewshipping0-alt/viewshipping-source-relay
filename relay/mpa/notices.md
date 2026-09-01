@@ -2,6 +2,14 @@
 
 Official listing: https://www.mpa.gov.sg/home?type=port+marine+notices
 
-## [PORT MARINE NOTICE NO. 104 OF 2026](https://www.mpa.gov.sg/media-centre/details/port-marine-notice-104-of-2026-crane-barge-overnight-staying-at-pulau-satumu)
+## [PORT MARINE NOTICE NO. 107 OF 2026](https://www.mpa.gov.sg/media-centre/details/port-marine-notice-107-of-2026-scheduled-maintenance-of-ica-crew-system-8-and-15-sep-2026)
 
-Published 31 Aug 2026
+Published 01 Sep 2026
+
+## [PORT MARINE NOTICE NO. 106 OF 2026](https://www.mpa.gov.sg/media-centre/details/port-marine-notice-106-of-2026-immigration-clearance-requirement-for-sea-crew-and-passengers-at-singapore-piers-and-ports)
+
+Published 01 Sep 2026
+
+## [PORT MARINE NOTICE NO. 105 OF 2026](https://www.mpa.gov.sg/media-centre/details/port-marine-notice-105-of-2026-marine-soil-investigation-and-survey-works-at-temasek-fairway)
+
+Published 01 Sep 2026
