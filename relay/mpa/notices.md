@@ -9,7 +9,3 @@ Published 01 Sep 2026
 ## [PORT MARINE NOTICE NO. 106 OF 2026](https://www.mpa.gov.sg/media-centre/details/port-marine-notice-106-of-2026-immigration-clearance-requirement-for-sea-crew-and-passengers-at-singapore-piers-and-ports)
 
 Published 01 Sep 2026
-
-## [PORT MARINE NOTICE NO. 105 OF 2026](https://www.mpa.gov.sg/media-centre/details/port-marine-notice-105-of-2026-marine-soil-investigation-and-survey-works-at-temasek-fairway)
-
-Published 01 Sep 2026
