@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-09-14T23:53:49Z",
+  "generated_at": "2026-09-15T04:55:35Z",
   "purpose": "Validated official-source snapshots for the ViewShipping Intelligence Relay Bridge",
   "schema_version": 1,
   "sources": {
     "brazil_chm": {
       "fetched_at": null,
       "files": {},
-      "last_attempt_at": "2026-09-14T23:53:44Z",
+      "last_attempt_at": "2026-09-15T04:55:28Z",
       "last_attempt_error": "Brazil CHM live and official-history fallbacks failed. direct JSON discovery: No valid official CHM avradio JSON found in recent monthly directories | history fallback: Browser page lacked required warning markers at https://www.marinha.mil.br/chm/dados-do-segnav-avradio-historico/historico-2026",
       "last_attempt_status": "failed",
       "status": "unavailable"
     },
     "mpa_singapore": {
-      "fetched_at": "2026-09-14T23:53:49Z",
+      "fetched_at": "2026-09-15T04:55:35Z",
       "files": {
         "html": "mpa/notices.html",
         "markdown": "mpa/notices.md"
@@ -21,13 +21,13 @@
       "message": "Validated 4 dated official Port Marine Notices",
       "official_url": "https://www.mpa.gov.sg/home?type=port+marine+notices",
       "sha256": {
-        "html": "c94499036027bf0d02ba6d1adeab557b6da6bfe88cfe27b6b9d80fe8e1365eaa",
-        "markdown": "d3facd42cdd2f944c39f2e157bfa6e794e44ebab70a7c3bce476228b1755f644"
+        "html": "6154121961d9180cd5bc323e0bd8d8a51fb945bd1b696d2c42f8a1c20ce36026",
+        "markdown": "1e1f04091d304e99e3d214d3df38a6be0d6997257a0f33d2090a4e054258a862"
       },
       "status": "ok"
     },
     "panama_canal": {
-      "fetched_at": "2026-09-14T23:53:44Z",
+      "fetched_at": "2026-09-15T04:55:29Z",
       "files": {
         "page": "panama/advisories.html"
       },
@@ -35,7 +35,7 @@
       "message": "Validated 177 advisory references from the official table",
       "official_url": "https://pancanal.com/en/advisories-to-shipping/",
       "sha256": {
-        "page": "74f8fe0f104458808dcd0a9845b495ea78da8cf482bd443030537a198d482bf7"
+        "page": "1fd6e3ab8fe8b02a101bb415329c8e3262561a3999faf07fd0fbff19f6513e32"
       },
       "status": "ok"
     }
