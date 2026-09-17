@@ -2,6 +2,14 @@
 
 Official listing: https://www.mpa.gov.sg/home?type=port+marine+notices
 
+## [PORT MARINE NOTICE NO. 114 OF 2026 - DEPLOYMENT OF ADCP FOR PLUME SURVEY](https://www.mpa.gov.sg/media-centre/details/port-marine-notice-no-114-of-2026-deployment-of-adcp-for-plume-survey)
+
+Published 17 Sep 2026
+
+## [PORT MARINE NOTICE NO. 114 OF 2026 - DEPLOYMENT OF ADCP FOR PLUME SURVEY](https://www.mpa.gov.sg/api/media/f3e24b76-0bbe-40f8-8b78-1e658629706c/PMN-114-OF-2026---DEPLOYMENT-OF-ADCP-FOR-PLUME-SURVEY.pdf)
+
+Published 17 Sep 2026
+
 ## [PORT MARINE NOTICE NO. 113 OF 2026 - DEPLOYMENT OF SEABED ADCP FOR NUS RESEARCH](https://www.mpa.gov.sg/media-centre/details/port-marine-notice-no-113-of-2026-deployment-of-seabed-adcp-for-nus-research)
 
 Published 15 Sep 2026
