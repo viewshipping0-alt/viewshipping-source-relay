@@ -18,10 +18,6 @@ Published 15 Sep 2026
 
 Published 15 Sep 2026
 
-## [PORT MARINE NOTICE NO. 112 OF 2026 - DEMOLITION OF JETTY AND PART DEMOLITION AND ALTERATION WORKS AT 35 JURONG PIER ROAD](https://www.mpa.gov.sg/media-centre/details/port-marine-notice-no-112-of-2026-demolition-of-jetty-and-part-demolition-and-alteration-works-at-35-jurong-pier-road)
+## [PORT MARINE NOTICE NO. 115 OF 2026](https://www.mpa.gov.sg/media-centre/details/port-marine-notice-115-of-2026-construction-work-of-seawater-intake-channel-at-jurong-island)
 
-Published 35 JURONG 2026
-
-## [PORT MARINE NOTICE NO. 112 OF 2026 - DEMOLITION OF JETTY AND PART DEMOLITION AND ALTERATION WORKS AT 35 JURONG PIER ROAD](https://www.mpa.gov.sg/api/media/695e90c1-7e28-45ee-9d52-9821a9bada4a/pn112-26.pdf)
-
-Published 14 Sep 2026
+Published 21 Sep 2026

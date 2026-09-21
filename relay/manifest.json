@@ -1,33 +1,33 @@
 {
-  "generated_at": "2026-09-21T00:17:47Z",
+  "generated_at": "2026-09-21T05:04:53Z",
   "purpose": "Validated official-source snapshots for the ViewShipping Intelligence Relay Bridge",
   "schema_version": 1,
   "sources": {
     "brazil_chm": {
       "fetched_at": null,
       "files": {},
-      "last_attempt_at": "2026-09-21T00:17:38Z",
+      "last_attempt_at": "2026-09-21T05:04:47Z",
       "last_attempt_error": "Brazil CHM live and official-history fallbacks failed. direct JSON discovery: No valid official CHM avradio JSON found in recent monthly directories | history fallback: Browser page lacked required warning markers at https://www.marinha.mil.br/chm/dados-do-segnav-avradio-historico/historico-2026",
       "last_attempt_status": "failed",
       "status": "unavailable"
     },
     "mpa_singapore": {
-      "fetched_at": "2026-09-21T00:17:47Z",
+      "fetched_at": "2026-09-21T05:04:53Z",
       "files": {
         "html": "mpa/notices.html",
         "markdown": "mpa/notices.md"
       },
-      "item_count": 6,
-      "message": "Validated 6 dated official Port Marine Notices",
+      "item_count": 5,
+      "message": "Validated 5 dated official Port Marine Notices",
       "official_url": "https://www.mpa.gov.sg/home?type=port+marine+notices",
       "sha256": {
-        "html": "fe4a0410cef4df3cd9ff978c5d11e65baf3d4bd1d93a13791e176df78c3673e0",
-        "markdown": "d9d1e6125f917215cb6378c7f2e74183f03ad0d8727a07f41ef039e67106f6b0"
+        "html": "a48736e89d76d4c126dbdf125e847a648888df8dc6819ff78535a0038e81513a",
+        "markdown": "88d16a3236df5ca263fc94975e27c2f00be86d3392f8505cb2ff2e299a000bec"
       },
       "status": "ok"
     },
     "panama_canal": {
-      "fetched_at": "2026-09-21T00:17:43Z",
+      "fetched_at": "2026-09-21T05:04:47Z",
       "files": {
         "page": "panama/advisories.html"
       },
@@ -35,7 +35,7 @@
       "message": "Validated 177 advisory references from the official table",
       "official_url": "https://pancanal.com/en/advisories-to-shipping/",
       "sha256": {
-        "page": "7afa65ae26369bf1055721cab689aa7f3f18460bcd28966e3656e2b20c7c25ef"
+        "page": "0aee3967c15760ab543394780d5ec514ee4b3c19e86284c746d71265700fde6e"
       },
       "status": "ok"
     }
