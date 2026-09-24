@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-09-24T04:51:25Z",
+  "generated_at": "2026-09-24T10:02:17Z",
   "purpose": "Validated official-source snapshots for the ViewShipping Intelligence Relay Bridge",
   "schema_version": 1,
   "sources": {
     "brazil_chm": {
       "fetched_at": null,
       "files": {},
-      "last_attempt_at": "2026-09-24T04:51:21Z",
+      "last_attempt_at": "2026-09-24T10:02:12Z",
       "last_attempt_error": "Brazil CHM live and official-history fallbacks failed. direct JSON discovery: No valid official CHM avradio JSON found in recent monthly directories | history fallback: Browser page lacked required warning markers at https://www.marinha.mil.br/chm/dados-do-segnav-avradio-historico/historico-2026",
       "last_attempt_status": "failed",
       "status": "unavailable"
     },
     "mpa_singapore": {
-      "fetched_at": "2026-09-24T04:51:25Z",
+      "fetched_at": "2026-09-24T10:02:17Z",
       "files": {
         "html": "mpa/notices.html",
         "markdown": "mpa/notices.md"
@@ -21,13 +21,13 @@
       "message": "Validated 3 dated official Port Marine Notices",
       "official_url": "https://www.mpa.gov.sg/home?type=port+marine+notices",
       "sha256": {
-        "html": "7739cd88cf5346f9c9a0a6fb82acf6bcc36ad12cb2e66b328f820e486e55aed6",
-        "markdown": "bc497b80cb6922425ef80442f58381e06729f16a6cfae8aa80cb54c5987b1653"
+        "html": "7f19d9a744eb87d972516aa455bcea5cc8e976572224c0b7203c410f111492be",
+        "markdown": "f1a5a225ba2791a72bfe552e1efc4b3065a66b0e272c12bc671158abc36c89f4"
       },
       "status": "ok"
     },
     "panama_canal": {
-      "fetched_at": "2026-09-24T04:51:21Z",
+      "fetched_at": "2026-09-24T10:02:13Z",
       "files": {
         "page": "panama/advisories.html"
       },
@@ -35,7 +35,7 @@
       "message": "Validated 177 advisory references from the official table",
       "official_url": "https://pancanal.com/en/advisories-to-shipping/",
       "sha256": {
-        "page": "5e1b2bd8cc7621abbb0c664a75b2bcf20a68374fc05cd85572b1a1a435ec0157"
+        "page": "4a95195001a9e5a4f34186436a59b4875c6ff7839718a48483ed260907a98d9f"
       },
       "status": "ok"
     }
