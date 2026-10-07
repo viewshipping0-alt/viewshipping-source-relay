@@ -10,10 +10,6 @@ Published 02 Oct 2026
 
 Published 02 Oct 2026
 
-## [PORT MARINE NOTICE NO. 129 OF 2026 - MARINE SOIL INVESTIGATION WORKS AT JURONG PORT](https://www.mpa.gov.sg/media-centre/details/port-marine-notice-no-129-of-2026-marine-soil-investigation-works-at-jurong-port)
+## [PORT MARINE NOTICE NO. 131 OF 2026](https://www.mpa.gov.sg/media-centre/details/port-marine-notice-131-of-2026-rectification-of-floating-sea-barrier-at-sembawang)
 
-Published 01 Oct 2026
-
-## [PORT MARINE NOTICE NO. 129 OF 2026 - MARINE SOIL INVESTIGATION WORKS AT JURONG PORT](https://www.mpa.gov.sg/api/media/137af79f-dbfc-4061-a902-6b10343ce2e1/pn26-129.pdf)
-
-Published 01 Oct 2026
+Published 07 Oct 2026
