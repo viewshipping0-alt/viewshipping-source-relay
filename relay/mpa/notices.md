@@ -2,6 +2,14 @@
 
 Official listing: https://www.mpa.gov.sg/home?type=port+marine+notices
 
+## [PORT MARINE NOTICE NO. 138 OF 2026 - HAZE ADVISORY PSI 200 AND ABOVE](https://www.mpa.gov.sg/media-centre/details/port-marine-notice-no-138-of-2026-haze-advisory-psi-200-and-above)
+
+Published 14 Oct 2026
+
+## [PORT MARINE NOTICE NO. 138 OF 2026 - HAZE ADVISORY PSI 200 AND ABOVE](https://www.mpa.gov.sg/api/media/3cacc540-bdb6-4e66-8d49-e7f9c3bca162/PMN-138-of-2026---Haze-Advisory-PSI-200-and-above.pdf)
+
+Published 14 Oct 2026
+
 ## [PORT MARINE NOTICE NO. 137 OF 2026 - SEABED DREDGING AT LOYANG OFFSHORE SUPPLY BASE JETTY](https://www.mpa.gov.sg/media-centre/details/port-marine-notice-no-137-of-2026-seabed-dredging-at-loyang-offshore-supply-base-jetty)
 
 Published 14 Oct 2026
@@ -10,7 +18,7 @@ Published 14 Oct 2026
 
 Published 14 Oct 2026
 
-## [PORT MARINE NOTICE NO. 136 OF 2026 - OPERATION OF UNMANNED AIRCRAFT OVER SINGAPORE PORT WATERS](https://www.mpa.gov.sg/media-centre/details/pmn-136-of-2026-operation-of-unmanned-aircraft-over-singapore-port-waters)
+## [PORT MARINE NOTICE NO. 136 OF 2026 - OPERATION OF UNMANNED AIRCRAFT OVER SINGAPORE PORT WATERS](https://www.mpa.gov.sg/media-centre/details/port-marine-notice-no-136-of-2026-operation-of-unmanned-aircraft-over-singapore-port-waters)
 
 Published 14 Oct 2026
 
