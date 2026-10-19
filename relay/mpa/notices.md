@@ -2,6 +2,14 @@
 
 Official listing: https://www.mpa.gov.sg/home?type=port+marine+notices
 
+## [PORT MARINE NOTICE NO. 139 OF 2026 - CRANE BARGE OVERNIGHT STAYING AT PULAU SATUMU](https://www.mpa.gov.sg/media-centre/details/port-marine-notice-no-139-of-2026-crane-barge-overnight-staying-at-pulau-satumu)
+
+Published 19 Oct 2026
+
+## [PORT MARINE NOTICE NO. 139 OF 2026 - CRANE BARGE OVERNIGHT STAYING AT PULAU SATUMU](https://www.mpa.gov.sg/api/media/6134d5bb-a6b5-4e53-84c6-d8d90efbe266/pn26-139.pdf)
+
+Published 19 Oct 2026
+
 ## [PORT MARINE NOTICE NO. 138 OF 2026 - HAZE ADVISORY PSI 200 AND ABOVE](https://www.mpa.gov.sg/media-centre/details/port-marine-notice-no-138-of-2026-haze-advisory-psi-200-and-above)
 
 Published 14 Oct 2026
@@ -15,13 +23,5 @@ Published 14 Oct 2026
 Published 14 Oct 2026
 
 ## [PORT MARINE NOTICE NO. 137 OF 2026 - SEABED DREDGING AT LOYANG OFFSHORE SUPPLY BASE JETTY](https://www.mpa.gov.sg/api/media/8d7d3f91-3575-4c2c-98d5-96d819ac458a/pn26-137.pdf)
-
-Published 14 Oct 2026
-
-## [PORT MARINE NOTICE NO. 136 OF 2026 - OPERATION OF UNMANNED AIRCRAFT OVER SINGAPORE PORT WATERS](https://www.mpa.gov.sg/media-centre/details/port-marine-notice-no-136-of-2026-operation-of-unmanned-aircraft-over-singapore-port-waters)
-
-Published 14 Oct 2026
-
-## [PORT MARINE NOTICE NO. 136 OF 2026 - OPERATION OF UNMANNED AIRCRAFT OVER SINGAPORE PORT WATERS](https://www.mpa.gov.sg/api/media/8190dd2e-61b3-4f20-9465-f00c16d7b56a/pn26-136.pdf)
 
 Published 14 Oct 2026
