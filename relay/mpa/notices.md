@@ -2,6 +2,14 @@
 
 Official listing: https://www.mpa.gov.sg/home?type=port+marine+notices
 
+## [PORT MARINE NOTICE NO. 142 OF 2026 - POWER SHUTDOWN AT ICA CREW OFFICE – PSA PASIR PANJANG TERMINAL(PPT) 4 CREW OFFICE](https://www.mpa.gov.sg/media-centre/details/port-marine-notice-no-142-of-2026-power-shutdown-at-ica-crew-office-psa-pasir-panjang-terminalppt-4-crew-office)
+
+Published 4 CREW 2026
+
+## [PORT MARINE NOTICE NO. 142 OF 2026 - POWER SHUTDOWN AT ICA CREW OFFICE – PSA PASIR PANJANG TERMINAL(PPT) 4 CREW OFFICE](https://www.mpa.gov.sg/api/media/5abff951-8e2d-48af-90ef-07e8ec1d24a8/pn142-26.pdf)
+
+Published 22 Oct 2026
+
 ## [PORT MARINE NOTICE NO. 141 OF 2026 - MARINE SOIL INVESTIGATION WORKS FOR THE PROPOSED BIOMASS POWER PLANT AT JURONG ISLAND](https://www.mpa.gov.sg/media-centre/details/port-marine-notice-no-141-of-2026-marine-soil-investigation-works-for-the-proposed-biomass-power-plant-at-jurong-island)
 
 Published 21 Oct 2026
@@ -17,11 +25,3 @@ Published 5 READINGS 2026
 ## [PORT MARINE NOTICE NO. 140 OF 2026 - UPDATED HAZE ADVISORY – GUIDANCE ON USE OF PSI FORECAST AND 1-HOUR PM2.5 READINGS](https://www.mpa.gov.sg/api/media/46b5766d-ef45-4a37-aa3a-8143cb3ab634/pn26-140.pdf)
 
 Published 21 Oct 2026
-
-## [PORT MARINE NOTICE NO. 139 OF 2026 - CRANE BARGE OVERNIGHT STAYING AT PULAU SATUMU](https://www.mpa.gov.sg/media-centre/details/port-marine-notice-no-139-of-2026-crane-barge-overnight-staying-at-pulau-satumu)
-
-Published 19 Oct 2026
-
-## [PORT MARINE NOTICE NO. 139 OF 2026 - CRANE BARGE OVERNIGHT STAYING AT PULAU SATUMU](https://www.mpa.gov.sg/api/media/6134d5bb-a6b5-4e53-84c6-d8d90efbe266/pn26-139.pdf)
-
-Published 19 Oct 2026
