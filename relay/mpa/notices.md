@@ -17,11 +17,3 @@ Published 21 Oct 2026
 ## [PORT MARINE NOTICE NO. 141 OF 2026 - MARINE SOIL INVESTIGATION WORKS FOR THE PROPOSED BIOMASS POWER PLANT AT JURONG ISLAND](https://www.mpa.gov.sg/api/media/72076166-4d32-41b2-a6d2-c9789e942fd3/pn141-26.pdf)
 
 Published 21 Oct 2026
-
-## [PORT MARINE NOTICE NO. 140 OF 2026 - UPDATED HAZE ADVISORY – GUIDANCE ON USE OF PSI FORECAST AND 1-HOUR PM2.5 READINGS](https://www.mpa.gov.sg/media-centre/details/port-marine-notice-no-140-of-2026-updated-haze-advisory-guidance-on-use-of-psi-forecast-and-1-hour-pm25-readings)
-
-Published 5 READINGS 2026
-
-## [PORT MARINE NOTICE NO. 140 OF 2026 - UPDATED HAZE ADVISORY – GUIDANCE ON USE OF PSI FORECAST AND 1-HOUR PM2.5 READINGS](https://www.mpa.gov.sg/api/media/46b5766d-ef45-4a37-aa3a-8143cb3ab634/pn26-140.pdf)
-
-Published 21 Oct 2026
