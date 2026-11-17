@@ -2,6 +2,14 @@
 
 Official listing: https://www.mpa.gov.sg/home?type=port+marine+notices
 
+## [PORT MARINE NOTICE NO. 144 OF 2026 - DREDGING WORKS AT OMLUB JETTY/ EXXONMOBIL](https://www.mpa.gov.sg/media-centre/details/port-marine-notice-no-144-of-2026-dredging-works-at-omlub-jetty-exxonmobil)
+
+Published 17 Nov 2026
+
+## [PORT MARINE NOTICE NO. 144 OF 2026 - DREDGING WORKS AT OMLUB JETTY/ EXXONMOBIL](https://www.mpa.gov.sg/api/media/851d51ce-eb59-427d-a333-14ec7dcb23a1/pn144-26.pdf)
+
+Published 17 Nov 2026
+
 ## [PORT MARINE NOTICE NO. 143 OF 2026 - COASTAL DEVELOPMENT PROJECT AND TEMPORARY HOLDING AREA AT NORTHERN COAST OF WOODLANDS](https://www.mpa.gov.sg/media-centre/details/port-marine-notice-no-143-of-2026-coastal-development-project-and-temporary-holding-area-at-northern-coast-of-woodlands)
 
 Published 12 Nov 2026
